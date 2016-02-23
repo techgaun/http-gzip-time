@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Author: Samar
+# Original Post: http://jcarlosnorte.com/security/2016/02/21/date-leak-gzip-tor.html
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <url>"
+    echo "Eg: $0 http://bing.com"
+    exit 1
+fi
+
+data=$(curl -sL0 --raw --compressed -k "${1}")
+header=$(xxd -p -l2 -s0 <<< "${data}")
+
+if [[ "${header}" == "1f8b" ]]; then
+    date_be=$(xxd -p -l4 -s3 <<< "${data}")
+    date_le=$(echo ${date_be:6:2}${date_be:4:2}${date_be:2:2}${date_be:0:2})
+    if [[ "$((16#${date_le}))" -gt "2147483647" ]]; then
+        echo "The server does not provide time (or provides incorrect time) in gzip header"
+        exit
+    fi
+    datetime=$(date -u -d @$((16#${date_le})) +"%F %T")
+    if [[ "${datetime}" == "$(date -u +'%F %T')" ]]; then
+        echo -e "Note: This server might be sending time in UTC instead of local time.\n"
+    fi
+    echo -e "The server date time is: ${datetime}"
+    echo "The UTC time is: $(date -u +"%F %T")"
+else
+    echo "The server does not seem to have gzip compression enabled."
+fi
