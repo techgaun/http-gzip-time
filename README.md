@@ -4,7 +4,7 @@
 
 ### Description
 
-[This post](http://jcarlosnorte.com/security/2016/02/21/date-leak-gzip-tor.html) inspired me to write this bash script because I just wanted to spend time doing something fun. As it seems, some of the servers with gzip compression (most likely Windows servers) seem to send the timezone as part of [GZip header](http://www.forensicswiki.org/wiki/Gzip#File_header).
+[This post](http://jcarlosnorte.com/security/2016/02/21/date-leak-gzip-tor.html) inspired me to write this bash script because I just wanted to spend time doing something fun. As it seems, some of the servers with gzip compression (most likely Windows servers) seem to send the time in server's local timezone as part of [GZip header](http://www.forensicswiki.org/wiki/Gzip#File_header).
 
 ### Examples
 
